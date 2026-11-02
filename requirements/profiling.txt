@@ -1,0 +1,7 @@
+# DE-002 — Source Data Profiling
+# Install from the repository root with:
+# python -m pip install -r requirements/profiling.txt
+
+pandas
+openpyxl
+requests
