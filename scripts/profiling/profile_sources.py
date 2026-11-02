@@ -13,6 +13,7 @@ import argparse
 import hashlib
 import io
 import json
+import math
 from pathlib import Path
 import zipfile
 from datetime import datetime, timezone
@@ -191,6 +192,17 @@ def fetch_ecb(start='2010-12-01',end='2011-12-09'):
     return record
 
 
+def json_safe(value):
+    """Convert nonfinite floating-point sample metadata to valid JSON nulls."""
+    if isinstance(value, dict):
+        return {key: json_safe(item) for key, item in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [json_safe(item) for item in value]
+    if isinstance(value, float) and not math.isfinite(value):
+        return None
+    return value
+
+
 def main():
     parser=argparse.ArgumentParser()
     parser.add_argument('--retail-xlsx',type=Path)
@@ -222,7 +234,7 @@ def main():
         except Exception as ex:
             output['status']['ecb']='request_failed'
             output['ecb_fx']={'exception':repr(ex),'url':ECB_BASE}
-    args.output.write_text(json.dumps(output,ensure_ascii=False,indent=2),encoding='utf-8')
+    args.output.write_text(json.dumps(json_safe(output),ensure_ascii=False,indent=2,allow_nan=False),encoding='utf-8')
     print(f'Wrote {args.output}')
     print(json.dumps(output['status'],indent=2))
 
