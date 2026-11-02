@@ -1,16 +1,17 @@
 # Retail Analytics Data Platform
 
-Projekt szkoleniowy Data Engineering — dokumentacja i artefakty są organizowane według etapu przeglądu.
+Projekt szkoleniowy Data Engineering. Dokumentacja techniczna jest uporządkowana według funkcji, a kopie robocze według identyfikatorów zadań.
 
-## Dokumentacja docelowa
+## Dokumentacja i pliki projektu
 
-- [DE-001 — Business Requirements (reviewed v0.2)](business/requirements.md)
+- **DE-001 — Business Requirements:** [`business/requirements.md`](business/requirements.md) — wersja po review v0.2; część decyzji biznesowych pozostaje TBA.
+- **DE-002 — Source Data Profiling:** [`docs/data/source-profiling.md`](docs/data/source-profiling.md) — przejrzany raport v0.2, **wstępny: pomiary UCI/ECB do potwierdzenia**.
+- **DE-002 — Profiling script:** [`scripts/profiling/profile_sources.py`](scripts/profiling/profile_sources.py) — skrypt do zbierania pomiarów, bez potwierdzonego uruchomienia na pełnych oryginalnych danych w bieżącym przeglądzie.
 
-## Materiały robocze
+## Materiały robocze według zadań
 
-- [Folder robocze — indeks zadań](robocze/README.md)
-- [DE-001 — wstępna wersja requirements](robocze/DE-001/requirements_v0.1.md)
-- [DE-002 — raport Source Profiling (weryfikacja empiryczna w toku)](robocze/DE-002/sourceprofiling.md)
-- [DE-002 — skrypt profilowania źródeł](robocze/DE-002/profile_sources.py)
+- [Indeks plików roboczych](robocze/README.md)
+- [DE-001](robocze/DE-001/requirements_v0.1.md) — pierwotna wersja requirements.
+- [DE-002](robocze/DE-002/sourceprofiling.md) — raport roboczy; [skrypt roboczy](robocze/DE-002/profile_sources.py).
 
-Wersje w `robocze/DE-XXX/` są materiałami do review. Po akceptacji trafiają do odpowiedniego katalogu docelowego. Dokument `business/requirements.md` jest wersją po review, lecz część decyzji biznesowych nadal oznaczono jako TBA.
+W folderach `robocze/DE-XXX/` przechowujemy oryginalne wersje i materiały do review. Wersje opublikowane po przeglądzie trafiają do katalogów odpowiadających ich funkcji. Publikacja pliku nie oznacza automatycznie pełnej akceptacji wszystkich wyników.
