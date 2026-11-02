@@ -7,7 +7,7 @@
 **Scope:** UCI Online Retail (dataset 352) and ECB EXR daily GBP/EUR reference rates  
 **Business context:** DE-001 Business Requirements; DE-002 Source Profiling  
 **Accountable reviewers:** Daniel (engineering), Michael (financial semantics), Sarah (sales reporting), Emma (customer analytics)  
-**Delivery:** Contract specifications only; implementation architecture, pipeline design and software selection are out of scope. This document is the reviewed reference copy; the original submission remains in `robocze/DE-003/data_contracts_v0.1.md`.
+**Delivery:** Contract specifications only; implementation architecture, pipeline design and software selection are out of scope. This document is the reviewed reference copy; the original submission remains in `robocze/DE-003/data_contracts.md`.
 
 ## 1. Purpose and governing principles
 
@@ -372,7 +372,7 @@ These are deterministic examples to test **when a validator is implemented**. Th
 
 ## 13. Technical Lead Review — v0.2
 
-**Reviewed input:** `robocze/DE-003/data_contracts_v0.1.md`. This version retains the proposed business semantics and source-data limitations. It does not imply stakeholder sign-off or successful execution of the 17 future acceptance tests.
+**Reviewed input:** `robocze/DE-003/data_contracts.md`. This version retains the proposed business semantics and source-data limitations. It does not imply stakeholder sign-off or successful execution of the 17 future acceptance tests.
 
 | Change | Review rationale |
 |---|---|
