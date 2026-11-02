@@ -15,7 +15,6 @@ import io
 import json
 from pathlib import Path
 import zipfile
-from collections import Counter
 from datetime import datetime, timezone
 
 import pandas as pd
@@ -125,6 +124,24 @@ def retail_profile(path):
         'days_without_transactions_sample': [d.strftime('%Y-%m-%d') for d in absent[:30]],
         'months':months,
         'country_top_10':{str(k):int(v) for k,v in df['Country'].value_counts().head(10).items()},
+        'missingness_by_country':[
+            {'country':str(country),'rows':int(len(group)),
+             'missing_customer_id':int(group['CustomerID'].isna().sum()),
+             'missing_description':int(group['Description'].isna().sum())}
+            for country, group in df.groupby('Country',dropna=False)
+        ],
+        'missingness_by_invoice_class':{
+            'cancellation_prefix':{
+                'rows':int(cancel.sum()),
+                'missing_customer_id':int(df.loc[cancel,'CustomerID'].isna().sum()),
+                'missing_description':int(df.loc[cancel,'Description'].isna().sum())
+            },
+            'other':{
+                'rows':int((~cancel).sum()),
+                'missing_customer_id':int(df.loc[~cancel,'CustomerID'].isna().sum()),
+                'missing_description':int(df.loc[~cancel,'Description'].isna().sum())
+            }
+        },
         'notes':['Raw source preserved; no cleaning, line matching, currency conversion or revenue recognition policy applied.']
     }
 
@@ -134,7 +151,8 @@ def fetch_ecb(start='2010-12-01',end='2011-12-09'):
     params = {'startPeriod':start,'endPeriod':end,'format':'csvdata'}
     r = requests.get(url,params=params,headers={'Accept':'text/csv'},timeout=45)
     record={'request_url':r.url,'status_code':r.status_code,'content_type':r.headers.get('Content-Type'),
-            'response_bytes':len(r.content),'request_period':[start,end]}
+            'response_bytes':len(r.content),'response_sha256':hashlib.sha256(r.content).hexdigest(),
+            'request_period':[start,end]}
     if r.status_code != 200:
         record['body_preview']=r.text[:500]
         return record
@@ -150,6 +168,17 @@ def fetch_ecb(start='2010-12-01',end='2011-12-09'):
             record['invalid_dates']=int(dates.isna().sum())
             record['missing_or_invalid_rates']=int(vals.isna().sum())
             record['zero_or_negative_rates']=int((vals<=0).sum())
+            expected={'FREQ':'D','CURRENCY':'GBP','CURRENCY_DENOM':'EUR',
+                      'EXR_TYPE':'SP00','EXR_SUFFIX':'A'}
+            if set(expected).issubset(data.columns):
+                mismatch=pd.Series(False,index=data.index)
+                for col, value in expected.items():
+                    mismatch |= data[col].astype('string').ne(value).fillna(True)
+                record['unexpected_series_rows']=int(mismatch.sum())
+                record['series_dimensions_checked']=True
+            else:
+                record['series_dimensions_checked']=False
+                record['series_dimensions_missing']=list(set(expected)-set(data.columns))
             record['duplicate_observation_dates']=int(dates.duplicated().sum())
             record['weekend_observations']=int((dates.dt.weekday>=5).sum())
             record['rate_min']=float(vals.min())
@@ -172,17 +201,20 @@ def main():
     output={'run_utc':datetime.now(timezone.utc).isoformat(),
             'provenance':{'uci_url':UCI_ZIP,'ecb_url':ECB_BASE},'status':{}}
     path=args.retail_xlsx
+    downloaded=False
     if args.download_retail:
         path=Path('Online Retail.xlsx')
         try:
             download_retail(path)
+            downloaded=True
         except Exception as ex:
             output['status']['uci_download_error']=repr(ex)
-    if path and path.exists():
+    # Never mistake a stale file from an earlier run for the newly downloaded dataset.
+    if path and path.exists() and (not args.download_retail or downloaded):
         output['uci_retail']=retail_profile(path)
-        output['status']['uci']='measured_from_supplied_file'
+        output['status']['uci']='measured_from_download' if downloaded else 'measured_from_supplied_file'
     elif path:
-        output['status']['uci']='not_measured_no_file'
+        output['status']['uci']='not_measured_download_failed' if args.download_retail else 'not_measured_no_file'
     if args.with_ecb:
         try:
             output['ecb_fx']=fetch_ecb()
