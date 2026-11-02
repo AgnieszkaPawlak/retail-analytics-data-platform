@@ -1,14 +1,14 @@
 # Retail Analytics Data Platform — Source Profiling & Feasibility Report
 
 **Document ID:** DE-002  
-**Version:** 0.1 — preliminary evidence review  
+**Version:** 0.2 — technical review, empirical evidence pending  
 **Prepared:** 2026-11-02  
 **Input specification:** [`business/requirements.md`, BRS-DE-001 v0.2](https://github.com/AgnieszkaPawlak/retail-analytics-data-platform/blob/main/business/requirements.md)  
 **Sources under assessment:** UCI Online Retail (dataset 352) and ECB Exchange Rates (EXR)  
-**Decision:** **CONDITIONAL GO for a historical training/MVP exercise; NO GO for claiming complete satisfaction of DE-001 without additional evidence and business decisions.**
+**Decision:** **CONDITIONAL GO for designing the historical training/MVP project; NOT ACCEPTED as a completed empirical profiling baseline.** Full-file UCI measurements and actual ECB response evidence are still pending. This technical review does not imply stakeholder approval.
 
 > **Evidence integrity / significant limitation**  
-> This report distinguishes **[P]** publisher documentation, **[S]** independently published analyses of the original UCI file, **[I]** inference from source structure, and **[T]** tests executed in this assessment. The UCI ZIP (~22.6 MB) could not be downloaded to the execution environment; the ECB data endpoint could not be queried successfully from it. Consequently, **no numerical results below are presented as a new full-file [T] measurement**, and no ECB HTTP response/status is presented as an observed service response. Secondary statistics are provided to inform feasibility and must be **recomputed from an identified input-file SHA-256** before this report is accepted as a completed empirical baseline. A companion `profile_sources.py` implements those checks; it passed a local synthetic-fixture smoke test, **not** a test against UCI production data. No raw financial record is altered by this report.
+> This report distinguishes **[P]** publisher documentation, **[S]** independently published analyses of the original UCI file, **[I]** inference from source structure, and **[T]** tests executed in this assessment. The UCI ZIP (~22.6 MB) could not be downloaded to the execution environment; the ECB data endpoint could not be queried successfully from it. Consequently, **no numerical results below are presented as a new full-file [T] measurement**, and no ECB HTTP response/status is presented as an observed service response. Secondary statistics are provided to inform feasibility and must be **recomputed from an identified input-file SHA-256** before this report is accepted as a completed empirical baseline. A companion `profile_sources.py` implements those checks; its previous author reported a synthetic-fixture smoke test, **not** a test against UCI production data; independent reviewer execution has not been evidenced. No raw financial record is altered by this report.
 
 ## Executive summary
 
@@ -218,7 +218,7 @@ Accept: text/csv
 
 ## Reproduction and audit procedure
 
-The companion script [`profile_sources.py`](profile_sources.py) is supplied **for local execution**. It profiles the original XLSX without dropping records, computes field nulls, duplicate candidates, negative/zero value intersections, extremes, month-level missingness, timestamp gaps, and source SHA-256. Optional ECB mode makes the specified historical API request and records the returned schema, dates and key rate-quality checks. No credentials are embedded.
+The companion script [`profile_sources.py`](profile_sources.py) is supplied **for local execution**. It profiles the original XLSX without dropping records, computes field nulls, duplicate candidates, negative/zero value intersections, extremes, month-level missingness, timestamp gaps, and source SHA-256. Optional ECB mode makes the specified historical API request and records the HTTP status, response SHA-256, schema, series-dimension consistency where available, dates and key rate-quality checks. No credentials are embedded.
 
 ```bash
 python -m pip install pandas openpyxl requests
@@ -257,4 +257,25 @@ python profile_sources.py --retail-xlsx 'Online Retail.xlsx' --with-ecb --output
 
 ---
 
-**DE-002 disposition:** **Evidence-review draft / empirical profiling incomplete.** The appropriate next step is to run the raw-file and ECB checks above, fill the missing per-period statistics and live API observations, and obtain Finance/Customer business-policy decisions **before** promoting this report to a verified source baseline or starting to claim DE-001 acceptance.
+**DE-002 disposition:** **Reviewed with corrections / empirical profiling incomplete.** The appropriate next step is to run the raw-file and ECB checks above, fill the missing per-period statistics and live API observations, and obtain Finance/Customer business-policy decisions **before** promoting this report to a verified source baseline or starting to claim DE-001 acceptance.
+
+## Technical Lead Review — v0.2 (2026-11-02)
+
+**Review scope:** `sourceprofiling.md` and companion `profile_sources.py` in the repository. This was a static technical review of the GitHub source; no successful full-data execution or live ECB API response was independently verified during this review.
+
+### Corrections recorded
+
+1. **Evidence status clarified.** External-source statistics ([S]) remain useful hypotheses, not measurements from the source XLSX. DE-002 is reviewed but cannot be marked empirically complete until an identified raw-file SHA-256 and an API response record are provided.
+2. **Prevented stale-file misattribution in the collector.** A failed `--download-retail` request must not silently profile an existing local `Online Retail.xlsx` as though the new download succeeded. The collector now distinguishes `not_measured_download_failed` from successful retrieval.
+3. **Improved source-profile coverage.** The script now additionally records missing `CustomerID` and `Description` counts by country and by invoice-prefix class, supplementing existing month-level analysis. These outputs are still to be generated against the real dataset.
+4. **Improved ECB audit evidence.** The script records a SHA-256 fingerprint of the HTTP response and, where series dimensions are returned, checks that the response belongs to the requested `D.GBP.EUR.SP00.A` series.
+5. **Scope remains constrained.** There is still no evidence of full cancellation lineage, a second original transaction currency, or an independent finance ledger. Business approval and additional fixtures are required for those claims.
+
+### Reviewer-identified gaps still open
+
+- The script has not been run successfully on the original UCI XLSX and ECB response in this review; published [S] figures must be reconciled against actual collector outputs.
+- Missingness by country and invoice class is now instrumented, but validity intersections, full row-level reconciliation, and effect on signed line amounts still need explicit evidence.
+- ECB response validation still requires real execution, observation-date coverage analysis, a non-trading-day case, failure-case testing, and a documented policy for historical rates.
+- Unit/integration tests for the collector and committed execution evidence are not present in the repository snapshot reviewed.
+
+**Decision for roadmap:** Proceed to **DE-003 — Data Contracts & Quality Rules** provisionally using the documented source schema and explicit assumptions. Keep DE-002 evidence completion as a blocking prerequisite before accepting final data contracts or implementing ingestion against unverified assumptions.
