@@ -1,21 +1,26 @@
 # Retail Analytics Data Platform
 
-Projekt szkoleniowy Data Engineering. Dokumentacja techniczna jest uporządkowana według funkcji, a kopie robocze według identyfikatorów zadań.
+Praktyczny projekt Data Engineering: Python, AWS S3, Snowflake, dbt Core, Apache Airflow, Docker, pytest i GitHub Actions.
 
-## Dokumentacja i pliki projektu
+## Dokumentacja po review
 
-- **DE-001 — Business Requirements:** [`business/requirements.md`](business/requirements.md) — wersja po review v0.2; część decyzji biznesowych pozostaje TBA.
-- **DE-002 — Source Data Profiling:** [`docs/data/source-profiling.md`](docs/data/source-profiling.md) — przejrzany raport v0.2, **wstępny: pomiary UCI/ECB do potwierdzenia**.
-- **DE-002 — Profiling script:** [`scripts/profiling/profile_sources.py`](scripts/profiling/profile_sources.py) — skrypt do zbierania pomiarów z wymuszoną poprawną serializacją JSON.
+| Ticket | Artefakt | Status |
+|---|---|---|
+| DE-001 — Business Requirements | [business/requirements.md](business/requirements.md) | Reviewed v0.2; decyzje biznesowe TBA |
+| DE-002 — Source Data Profiling | [docs/data/source-profiling.md](docs/data/source-profiling.md) | Reviewed v0.2; pomiary i sign-off w toku |
+| DE-002 — Profiling script | [scripts/profiling/profile_sources.py](scripts/profiling/profile_sources.py) | Strict JSON output |
+| DE-003 — Data Contracts | [docs/data/data-contracts.md](docs/data/data-contracts.md) | Reviewed v0.2; akceptacja biznesowa otwarta |
+| DE-004 — Architecture | [docs/architecture/architecture.md](docs/architecture/architecture.md) | Reviewed v0.2; implementacja i mechanizm publikacji do weryfikacji |
+| DE-004 — KPI Definitions | [docs/business/kpi-definitions.md](docs/business/kpi-definitions.md) | Reviewed v0.2; oficjalne KPI wymagają zatwierdzenia |
+| DE-004 — Review | [docs/architecture/DE-004-review.md](docs/architecture/DE-004-review.md) | Uzasadnienie korekt i otwarte decyzje |
 
-- **DE-003 — Data Contracts & Quality Rules:** [`docs/data/data-contracts.md`](docs/data/data-contracts.md) — po technical review v0.2; wymaga zatwierdzenia biznesowego i późniejszego wykonania testów kontraktowych.
-- **DE-002 — Profiling evidence:** [`profiling_evidence.json`](profiling_evidence.json) — zapisany pomiar, podczas review znormalizowany do poprawnego JSON. Oryginalna postać z `NaN` jest zachowana w [`robocze/DE-002/profiling_evidence_original.txt`](robocze/DE-002/profiling_evidence_original.txt).
+## Source evidence
 
-## Materiały robocze według zadań
+- [Profiling results](profiling_evidence.json) — zapisane pomiary; format JSON znormalizowany bez ponownego profilowania.
+- [Oryginalna wersja dowodów](robocze/DE-002/profiling_evidence_original.txt) — historyczne artefakty do audytu.
 
-- [Indeks plików roboczych](robocze/README.md)
-- [DE-001](robocze/DE-001/requirements_v0.1.md) — pierwotna wersja requirements.
-- [DE-002](robocze/DE-002/sourceprofiling.md) — raport roboczy; [skrypt roboczy](robocze/DE-002/profile_sources.py).
-- [DE-003](robocze/DE-003/data_contracts.md) — pierwotne rozwiązanie Data Contracts.
+## Praca nad zadaniami
 
-W folderach `robocze/DE-XXX/` przechowujemy oryginalne wersje i materiały do review. Wersje opublikowane po przeglądzie trafiają do katalogów odpowiadających ich funkcji. Publikacja pliku nie oznacza automatycznie pełnej akceptacji wszystkich wyników.
+Nowe rozwiązania zapisujemy w katalogach [robocze/DE-XXX](robocze/README.md). Po code review ich oryginalne wersje pozostają w folderze zadania, a poprawione dokumenty trafiają do katalogów docelowych.
+
+**Uwaga:** Technical review nie oznacza wykonanych testów runtime ani formalnego zatwierdzenia zasad finansowych.

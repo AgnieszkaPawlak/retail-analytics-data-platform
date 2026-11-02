@@ -1,10 +1,10 @@
 # Northstar Retail — Retail Analytics Platform Architecture
 
 **Document ID:** ARCH-DE-004  
-**Version:** 0.1 — architecture proposal  
-**Status:** DRAFT, not implemented or business-approved  
+**Version:** 0.2 — technical review; target architecture aligned with approved project stack  
+**Status:** REVIEWED DESIGN — not implemented; business decisions and technical validation pending  
 **Date:** 2026-11-02  
-**Companion:** [kli_definitions.md](kli_definitions.md) — KPI definitions (filename per task request)  
+**Companion:** [kpi-definitions.md](../business/kpi-definitions.md) — reviewed KPI catalogue  
 **Inputs:** [DE-001 business requirements](../../business/requirements.md), [DE-002 source profiling](../../docs/data/source-profiling.md), [DE-003 reviewed data contracts](../../docs/data/data-contracts.md), [profiling evidence](../../profiling_evidence.json).
 
 > Scope: architecture and logical data/metrics design only. No ETL code, database DDL or infrastructure configuration. Financial definitions, FX policy and customer valuation remain **TBA** where stakeholders have not approved them.
@@ -15,7 +15,7 @@ Propose a **batch-oriented historical analytics platform** using two sources: UC
 
 **Non-negotiable invariant:** An unsuccessful, incomplete or inconsistent candidate build **never replaces the last successfully published report**. One release contains the source snapshots, validated marts, contract versions and metric definitions required by all of its consumers. The last-success timestamp advances only after complete publication.
 
-**Proposed technology, not installed:** Python (XLSX and HTTP acquisition / validation), immutable file snapshots, PostgreSQL (layered analytical tables, transactional publication), dbt Core (SQL transformations and tests), Prefect (batch workflow/retries) and a read-only BI interface (Metabase candidate). The archived 541,909-line dataset does not justify distributed processing in this educational MVP.
+**Target stack (approved project baseline, not yet installed):** Python for XLSX/API acquisition and validation; AWS S3 for immutable raw snapshots; Snowflake for raw/staging/intermediate/marts and release metadata; dbt Core for transformations and tests; Apache Airflow for orchestration, retries and backfills; Docker Compose for local development; pytest and GitHub Actions for quality gates. A read-only BI tool such as Metabase is an optional extension. PostgreSQL + Prefect was proposed in the original draft but would require an explicit change to the approved learning scope. The historical dataset does not justify distributed processing.
 
 ### 1.1 Business drivers and design response
 
@@ -35,7 +35,8 @@ Propose a **batch-oriented historical analytics platform** using two sources: UC
 flowchart LR
   U["UCI Online Retail<br/>historical XLSX / GBP"] --> A["Acquire and fingerprint<br/>source ID, SHA-256, retrieval"]
   E["ECB EXR<br/>GBP per EUR / API"] --> A
-  A --> R["RAW<br/>immutable source files<br/>raw rows and response metadata"]
+  A --> OBJ["AWS S3 RAW OBJECTS<br/>immutable XLSX/ECB snapshots<br/>hashes and manifests"]
+  OBJ --> R["Snowflake RAW TABLES<br/>source rows and response metadata"]
   R --> V["Data contract validation<br/>DE-003 rules"]
   V -->|"accepted with flags"| S["STAGING<br/>typed rows, source lineage<br/>quality/parse flags"]
   V -->|"errors / warnings"| Q["Quality register<br/>quarantine, impact, audit"]
@@ -51,6 +52,14 @@ flowchart LR
   H --> CA["Customer Analytics"]
   P --> O["Last successful publish<br/>and coverage status"]
   F --> O
+  AIR["Apache Airflow<br/>schedule, retries, backfills"] -.-> A
+  AIR -.-> V
+  AIR -.-> G
+  DBT["dbt Core<br/>models + tests"] -.-> S
+  DBT -.-> I
+  DBT -.-> M
+  CI["GitHub Actions<br/>lint + tests"] -.-> V
+  CI -.-> DBT
 ~~~
 
 **Interpretation:** A job may ingest and transform data successfully but remain unpublished. Contracts are checked before analytical models; metric-specific eligibility and report dependency coverage are checked **again at the release gate**. Dashboards cannot query candidate marts directly.
@@ -82,6 +91,10 @@ stateDiagram-v2
 | Component | What it owns | Input → output | Failure behavior |
 |---|---|---|---|
 | **Acquisition** | Download UCI, request ECB, record URL, window, HTTP status, retrieval UTC and SHA-256 | Source → immutable artifact + manifest | Record failed attempt; no publish |
+| **AWS S3 raw store** | Persist immutable original XLSX/ECB response and source manifest | Acquisition → versioned source objects | Upload failure leaves prior objects/release unchanged |
+| **Snowflake warehouse** | Store ingested raw observations, staged/intermediate models, candidate marts and release metadata | S3 raw objects → analytical tables | Failed candidate cannot alter published marts |
+| **dbt Core** | Version shared SQL transformations, models, lineage and tests | Warehouse staging → intermediate/marts | Test failure blocks release gate |
+| **Apache Airflow** | Orchestrate acquisition, S3 upload, warehouse loading, dbt tasks and release gate | Defined DAG → run status | Retry transient errors without changing prior published version |
 | **Source catalog** | Track source vintage, batch ID, hash, date range, contract version | Artifact → source_batch | Same-content replay is idempotent; changed source is a new vintage |
 | **Contract validator** | Check DE-003 schema, completeness, uniqueness, validity and FX identity | Raw rows → violations, quarantine, eligibility flags | CRITICAL rejects batch; financial ERROR holds affected publication |
 | **RAW** | Preserve exact source evidence and its physical record order | Original XLSX / ECB CSV → immutable rows | No dedup, sign changes, forced values or currency inference |
@@ -106,7 +119,7 @@ stateDiagram-v2
 | **MARTS** | Aggregate and validate data per metric version/release | mart_daily_sales, mart_daily_finance, mart_customer_period, mart_customer_value | Candidate versions remain isolated and never appear as current |
 | **PUBLISHED ACCESS** | Consistent read-only semantic layer | vw_published_sales, vw_published_finance, vw_published_customers, vw_report_status | Views only expose active/pinned complete releases |
 
-A RAW artifact store may be local immutable files in an educational implementation or object storage later; the decision does not change logical layer boundaries.
+AWS S3 is the proposed durable storage for original RAW artifacts; Snowflake RAW tables store warehouse-ingested source observations. During early local development, filesystem fixtures may replace S3, but this is only a test-stage substitute and not the accepted cloud architecture.
 
 ## 5. Logical data model
 
@@ -166,7 +179,7 @@ The release manifest must explicitly list **both source vintages, contract versi
 
 ## 6. Shared KPI semantic model: why Sales and Finance agree
 
-The authoritative catalogue is [kli_definitions.md](kli_definitions.md). A metric request is uniquely specified by **metric_id + metric_version + publication release_id + reporting date basis + currency + filters/dimensions**.
+The authoritative catalogue is [kpi-definitions.md](../business/kpi-definitions.md). A metric request is uniquely specified by **metric_id + metric_version + publication release_id + reporting date basis + currency + filters/dimensions**.
 
 1. Metric formulas live in **shared intermediate/semantic models**, not separate Sales and Finance dashboards. A display name alone is not a definition.
 2. Reports use published views that join only the release pinned for the whole report refresh. A refresh spanning multiple queries must retain one release_id even if a new release activates mid-refresh.
@@ -197,8 +210,8 @@ The authoritative catalogue is [kli_definitions.md](kli_definitions.md). A metri
 1. Allocate a new **release_id** and immutable manifest listing source artifact hashes and selected contract/metric versions.
 2. Validate source batches and classify all exceptions. CRITICAL input failures reject a batch; isolated record errors are quarantined, but **unresolved monetary impact blocks dependent publication**.
 3. Build all candidate intermediate models and marts under this release_id. Confirm source/FX coverage, completeness, metric eligibility and agreement between Sales/Finance aggregations.
-4. A candidate with missing critical dependencies or TBA policies for required metrics is **BLOCKED**; its data is never exposed via published views.
-5. On complete validation, perform a **single PostgreSQL transaction**: verify current pointer has not changed unexpectedly, mark new release published and switch **current_release** to new release. Commit atomically. A rollback leaves old release visible.
+4. The release manifest explicitly declares its **required** metric versions and report families. Missing critical dependencies or unapproved policies for these *required* metrics BLOCK the candidate; an unrelated optional TBA metric is not silently promoted to official status nor allowed to deadlock approved diagnostic-only output. No blocked candidate is exposed via published views.
+5. On complete validation, activate a verified release **atomically within Snowflake publication metadata**: use a transactionally controlled active-release pointer with a concurrency guard; its exact implementation must be validated against Snowflake DML/transaction semantics. The pointer switch is not a distributed transaction with S3, Airflow, or dbt, and DDL should not be assumed to participate in the same transaction. If activation fails, published views must still resolve to the prior verified release.
 6. Reports read only the new pointer after commit and pin its release_id for the duration of their refresh. The publication timestamp is recorded on successful commit.
 7. Retain old releases for audited comparison under an approved retention policy (TBA).
 
@@ -228,11 +241,11 @@ The authoritative catalogue is [kli_definitions.md](kli_definitions.md). A metri
 |---|---|---|
 | **ADR-01** | Historical **batch** rather than streaming | UCI XLSX is static; ECB is reference-rate history; simpler to operate and replay |
 | **ADR-02** | Python for acquisition and contract validation | Existing Python profiling work; strong XLSX and HTTP support; validator implementation deferred |
-| **ADR-03** | PostgreSQL for staged data, marts and atomic publication | ACID transactions and consistent shared views; DuckDB lighter for exploration, but not chosen as multi-reader publication authority |
+| **ADR-03** | AWS S3 + Snowflake for raw storage, warehouse tables, marts and publication metadata | Matches approved learning stack; S3 holds immutable artifacts; Snowflake hosts governed analytic data. PostgreSQL can still serve as Airflow metadata database. Original PostgreSQL-as-warehouse proposal is an alternate ADR requiring scope approval. |
 | **ADR-04** | Retain immutable raw source files and row lineage | Supports recovery, reproducibility and forensic analysis at modest dataset size |
 | **ADR-05** | dbt Core for SQL transformations/tests and versioned models | Centralized definitions and testability, rather than formula copies in dashboards |
-| **ADR-06** | Prefect as workflow/retry coordinator | Python-oriented batch scheduling and observability; simpler alternatives possible if operations stay minimal |
-| **ADR-07** | Metabase or equivalent **read-only** BI over published views | Business reports use governed measures, not their own accounting formulas |
+| **ADR-06** | Apache Airflow as workflow/retry coordinator | Matches approved project scope and provides DAG scheduling, retries and backfills. Original Prefect design remains a valid alternative requiring an explicit ADR change. |
+| **ADR-07** | Optional read-only BI, e.g. Metabase | Not needed for MVP ingestion/warehouse acceptance; if added, consumers must query governed published views and pin a release per report refresh. |
 | **ADR-08** | One **unified global release pointer** | Prevents mixed Sales/Finance vintages; may delay GBP reports when FX inputs fail; independent families require approval |
 | **ADR-09** | Fixed-point GBP calculations, versioned ECB rates | Avoids float errors and wrong FX direction; policy details TBA |
 | **ADR-10** | Keep flagged duplicates, cancellations and anonymous-customer lines | DE-002/003 do not justify blanket deletion; financial totals must be reconcilable |
@@ -281,6 +294,16 @@ These are **future test/walkthrough specifications**, not tests executed for thi
 - [Source profiling — DE-002](../../docs/data/source-profiling.md)
 - [Data contracts — DE-003 reviewed](../../docs/data/data-contracts.md)
 - [Recorded profiling evidence](../../profiling_evidence.json)
-- [DE-004 KPI/metric definitions](kli_definitions.md)
+- [DE-004 KPI/metric definitions](../business/kpi-definitions.md)
 
 **Evidence note:** Source profiling results are taken from repository artifacts, not recomputed in this task. Architecture assertions and failure walkthroughs are design proposals, not completed runtime tests.
+
+## 13. Technical Lead review / changelog — v0.2
+
+- Aligned the proposed stack with the previously approved S3 + Snowflake + Airflow + dbt plan; preserved PostgreSQL + Prefect as an explicitly unapproved alternative, not a silently adopted design.
+- Distinguished immutable S3 source objects from Snowflake RAW tables; added Airflow, dbt and CI responsibilities to the architecture diagram.
+- Replaced a PostgreSQL-only release transaction with a Snowflake-scoped atomic publication requirement; S3, Airflow and Snowflake are **not** one distributed ACID transaction.
+- Preserved the critical concept of one global published release, with release ID pinned for the entire multi-query report refresh.
+- Fixed the KPI companion link and documented unresolved business approval and publication validation work.
+
+**DE-004 review disposition:** Design accepted for further technical planning subject to warehouse-scoped publication proof, explicit ownership of TBA KPI definitions and tests during implementation. No infrastructure or pipeline execution is claimed.
