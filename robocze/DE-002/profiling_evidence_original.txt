@@ -1,0 +1,636 @@
+{
+  "run_utc": "2026-11-02T12:45:28.245525+00:00",
+  "provenance": {
+    "uci_url": "https://archive.ics.uci.edu/static/public/352/online+retail.zip",
+    "ecb_url": "https://data-api.ecb.europa.eu/service/data/EXR/D.GBP.EUR.SP00.A"
+  },
+  "status": {
+    "uci": "measured_from_download",
+    "ecb": "response_observed"
+  },
+  "uci_retail": {
+    "source_file": "Online Retail.xlsx",
+    "source_sha256": "43465a06f2ccf7c8b5bd2892bc7defb52f97487934fe93b16ae4c3936424676d",
+    "rows": 541909,
+    "columns": [
+      "InvoiceNo",
+      "StockCode",
+      "Description",
+      "Quantity",
+      "InvoiceDate",
+      "UnitPrice",
+      "CustomerID",
+      "Country"
+    ],
+    "dtype_inferred": {
+      "InvoiceNo": "string",
+      "StockCode": "string",
+      "Description": "string",
+      "Quantity": "int64",
+      "InvoiceDate": "datetime64[us]",
+      "UnitPrice": "float64",
+      "CustomerID": "float64",
+      "Country": "string"
+    },
+    "missing": {
+      "InvoiceNo": 0,
+      "StockCode": 0,
+      "Description": 1454,
+      "Quantity": 0,
+      "InvoiceDate": 0,
+      "UnitPrice": 0,
+      "CustomerID": 135080,
+      "Country": 0
+    },
+    "missing_pct": {
+      "InvoiceNo": 0.0,
+      "StockCode": 0.0,
+      "Description": 0.2683,
+      "Quantity": 0.0,
+      "InvoiceDate": 0.0,
+      "UnitPrice": 0.0,
+      "CustomerID": 24.9267,
+      "Country": 0.0
+    },
+    "description_missing_with_customer_missing": 1454,
+    "full_duplicate_rows_excluding_first": 5268,
+    "unique_invoices": 25900,
+    "unique_customers": 4372,
+    "unique_stock_codes": 4070,
+    "unique_countries": 38,
+    "unique_invoice_stock_pairs": 531225,
+    "repeated_invoice_stock_rows_excluding_first": 10684,
+    "stock_codes_with_multiple_descriptions": 650,
+    "cancellation_prefix_rows": 9288,
+    "negative_quantity_rows": 10624,
+    "negative_quantity_without_cancellation_prefix": 1336,
+    "cancel_prefix_without_negative_quantity": 0,
+    "zero_quantity_rows": 0,
+    "zero_unit_price_rows": 2515,
+    "negative_unit_price_rows": 2,
+    "non_numeric_quantity_rows": 0,
+    "non_numeric_unit_price_rows": 0,
+    "invalid_invoice_dates": 0,
+    "quantity_distribution": {
+      "min": -80995.0,
+      "p01": -2.0,
+      "median": 3.0,
+      "p99": 100.0,
+      "max": 80995.0
+    },
+    "unit_price_distribution": {
+      "min": -11062.06,
+      "p01": 0.19,
+      "median": 2.08,
+      "p99": 18.0,
+      "max": 38970.0
+    },
+    "first_invoice_ts": "2010-12-01T08:26:00",
+    "last_invoice_ts": "2011-12-09T12:50:00",
+    "active_calendar_days": 305,
+    "calendar_days_without_transactions": 69,
+    "days_without_transactions_sample": [
+      "2010-12-04",
+      "2010-12-11",
+      "2010-12-18",
+      "2010-12-24",
+      "2010-12-25",
+      "2010-12-26",
+      "2010-12-27",
+      "2010-12-28",
+      "2010-12-29",
+      "2010-12-30",
+      "2010-12-31",
+      "2011-01-01",
+      "2011-01-02",
+      "2011-01-03",
+      "2011-01-08",
+      "2011-01-15",
+      "2011-01-22",
+      "2011-01-29",
+      "2011-02-05",
+      "2011-02-12",
+      "2011-02-19",
+      "2011-02-26",
+      "2011-03-05",
+      "2011-03-12",
+      "2011-03-19",
+      "2011-03-26",
+      "2011-04-02",
+      "2011-04-09",
+      "2011-04-16",
+      "2011-04-22"
+    ],
+    "months": [
+      {
+        "month": "2010-12",
+        "rows": 42481,
+        "missing_customer_id": 15631,
+        "missing_description": 125,
+        "cancellation_prefix_rows": 728
+      },
+      {
+        "month": "2011-01",
+        "rows": 35147,
+        "missing_customer_id": 13235,
+        "missing_description": 114,
+        "cancellation_prefix_rows": 701
+      },
+      {
+        "month": "2011-02",
+        "rows": 27707,
+        "missing_customer_id": 7344,
+        "missing_description": 65,
+        "cancellation_prefix_rows": 475
+      },
+      {
+        "month": "2011-03",
+        "rows": 36748,
+        "missing_customer_id": 8926,
+        "missing_description": 165,
+        "cancellation_prefix_rows": 699
+      },
+      {
+        "month": "2011-04",
+        "rows": 29916,
+        "missing_customer_id": 6718,
+        "missing_description": 226,
+        "cancellation_prefix_rows": 559
+      },
+      {
+        "month": "2011-05",
+        "rows": 37030,
+        "missing_customer_id": 8122,
+        "missing_description": 138,
+        "cancellation_prefix_rows": 621
+      },
+      {
+        "month": "2011-06",
+        "rows": 36874,
+        "missing_customer_id": 9038,
+        "missing_description": 91,
+        "cancellation_prefix_rows": 711
+      },
+      {
+        "month": "2011-07",
+        "rows": 39518,
+        "missing_customer_id": 12016,
+        "missing_description": 155,
+        "cancellation_prefix_rows": 685
+      },
+      {
+        "month": "2011-08",
+        "rows": 35284,
+        "missing_customer_id": 7622,
+        "missing_description": 82,
+        "cancellation_prefix_rows": 668
+      },
+      {
+        "month": "2011-09",
+        "rows": 50226,
+        "missing_customer_id": 9404,
+        "missing_description": 99,
+        "cancellation_prefix_rows": 805
+      },
+      {
+        "month": "2011-10",
+        "rows": 60742,
+        "missing_customer_id": 10047,
+        "missing_description": 104,
+        "cancellation_prefix_rows": 1200
+      },
+      {
+        "month": "2011-11",
+        "rows": 84711,
+        "missing_customer_id": 19113,
+        "missing_description": 75,
+        "cancellation_prefix_rows": 1076
+      },
+      {
+        "month": "2011-12",
+        "rows": 25525,
+        "missing_customer_id": 7864,
+        "missing_description": 15,
+        "cancellation_prefix_rows": 360
+      }
+    ],
+    "country_top_10": {
+      "United Kingdom": 495478,
+      "Germany": 9495,
+      "France": 8557,
+      "EIRE": 8196,
+      "Spain": 2533,
+      "Netherlands": 2371,
+      "Belgium": 2069,
+      "Switzerland": 2002,
+      "Portugal": 1519,
+      "Australia": 1259
+    },
+    "missingness_by_country": [
+      {
+        "country": "Australia",
+        "rows": 1259,
+        "missing_customer_id": 0,
+        "missing_description": 0
+      },
+      {
+        "country": "Austria",
+        "rows": 401,
+        "missing_customer_id": 0,
+        "missing_description": 0
+      },
+      {
+        "country": "Bahrain",
+        "rows": 19,
+        "missing_customer_id": 2,
+        "missing_description": 0
+      },
+      {
+        "country": "Belgium",
+        "rows": 2069,
+        "missing_customer_id": 0,
+        "missing_description": 0
+      },
+      {
+        "country": "Brazil",
+        "rows": 32,
+        "missing_customer_id": 0,
+        "missing_description": 0
+      },
+      {
+        "country": "Canada",
+        "rows": 151,
+        "missing_customer_id": 0,
+        "missing_description": 0
+      },
+      {
+        "country": "Channel Islands",
+        "rows": 758,
+        "missing_customer_id": 0,
+        "missing_description": 0
+      },
+      {
+        "country": "Cyprus",
+        "rows": 622,
+        "missing_customer_id": 0,
+        "missing_description": 0
+      },
+      {
+        "country": "Czech Republic",
+        "rows": 30,
+        "missing_customer_id": 0,
+        "missing_description": 0
+      },
+      {
+        "country": "Denmark",
+        "rows": 389,
+        "missing_customer_id": 0,
+        "missing_description": 0
+      },
+      {
+        "country": "EIRE",
+        "rows": 8196,
+        "missing_customer_id": 711,
+        "missing_description": 0
+      },
+      {
+        "country": "European Community",
+        "rows": 61,
+        "missing_customer_id": 0,
+        "missing_description": 0
+      },
+      {
+        "country": "Finland",
+        "rows": 695,
+        "missing_customer_id": 0,
+        "missing_description": 0
+      },
+      {
+        "country": "France",
+        "rows": 8557,
+        "missing_customer_id": 66,
+        "missing_description": 0
+      },
+      {
+        "country": "Germany",
+        "rows": 9495,
+        "missing_customer_id": 0,
+        "missing_description": 0
+      },
+      {
+        "country": "Greece",
+        "rows": 146,
+        "missing_customer_id": 0,
+        "missing_description": 0
+      },
+      {
+        "country": "Hong Kong",
+        "rows": 288,
+        "missing_customer_id": 288,
+        "missing_description": 0
+      },
+      {
+        "country": "Iceland",
+        "rows": 182,
+        "missing_customer_id": 0,
+        "missing_description": 0
+      },
+      {
+        "country": "Israel",
+        "rows": 297,
+        "missing_customer_id": 47,
+        "missing_description": 0
+      },
+      {
+        "country": "Italy",
+        "rows": 803,
+        "missing_customer_id": 0,
+        "missing_description": 0
+      },
+      {
+        "country": "Japan",
+        "rows": 358,
+        "missing_customer_id": 0,
+        "missing_description": 0
+      },
+      {
+        "country": "Lebanon",
+        "rows": 45,
+        "missing_customer_id": 0,
+        "missing_description": 0
+      },
+      {
+        "country": "Lithuania",
+        "rows": 35,
+        "missing_customer_id": 0,
+        "missing_description": 0
+      },
+      {
+        "country": "Malta",
+        "rows": 127,
+        "missing_customer_id": 0,
+        "missing_description": 0
+      },
+      {
+        "country": "Netherlands",
+        "rows": 2371,
+        "missing_customer_id": 0,
+        "missing_description": 0
+      },
+      {
+        "country": "Norway",
+        "rows": 1086,
+        "missing_customer_id": 0,
+        "missing_description": 0
+      },
+      {
+        "country": "Poland",
+        "rows": 341,
+        "missing_customer_id": 0,
+        "missing_description": 0
+      },
+      {
+        "country": "Portugal",
+        "rows": 1519,
+        "missing_customer_id": 39,
+        "missing_description": 0
+      },
+      {
+        "country": "RSA",
+        "rows": 58,
+        "missing_customer_id": 0,
+        "missing_description": 0
+      },
+      {
+        "country": "Saudi Arabia",
+        "rows": 10,
+        "missing_customer_id": 0,
+        "missing_description": 0
+      },
+      {
+        "country": "Singapore",
+        "rows": 229,
+        "missing_customer_id": 0,
+        "missing_description": 0
+      },
+      {
+        "country": "Spain",
+        "rows": 2533,
+        "missing_customer_id": 0,
+        "missing_description": 0
+      },
+      {
+        "country": "Sweden",
+        "rows": 462,
+        "missing_customer_id": 0,
+        "missing_description": 0
+      },
+      {
+        "country": "Switzerland",
+        "rows": 2002,
+        "missing_customer_id": 125,
+        "missing_description": 0
+      },
+      {
+        "country": "USA",
+        "rows": 291,
+        "missing_customer_id": 0,
+        "missing_description": 0
+      },
+      {
+        "country": "United Arab Emirates",
+        "rows": 68,
+        "missing_customer_id": 0,
+        "missing_description": 0
+      },
+      {
+        "country": "United Kingdom",
+        "rows": 495478,
+        "missing_customer_id": 133600,
+        "missing_description": 1454
+      },
+      {
+        "country": "Unspecified",
+        "rows": 446,
+        "missing_customer_id": 202,
+        "missing_description": 0
+      }
+    ],
+    "missingness_by_invoice_class": {
+      "cancellation_prefix": {
+        "rows": 9288,
+        "missing_customer_id": 383,
+        "missing_description": 0
+      },
+      "other": {
+        "rows": 532621,
+        "missing_customer_id": 134697,
+        "missing_description": 1454
+      }
+    },
+    "notes": [
+      "Raw source preserved; no cleaning, line matching, currency conversion or revenue recognition policy applied."
+    ]
+  },
+  "ecb_fx": {
+    "request_url": "https://data-api.ecb.europa.eu/service/data/EXR/D.GBP.EUR.SP00.A?startPeriod=2010-12-01&endPeriod=2011-12-09&format=csvdata",
+    "status_code": 200,
+    "content_type": "text/csv",
+    "response_bytes": 58537,
+    "response_sha256": "451245e2eb899ddab2c7e58de6ad270eb9854ee7e6e875b1c9295c7f84ad9bb0",
+    "request_period": [
+      "2010-12-01",
+      "2011-12-09"
+    ],
+    "response_fields": [
+      "KEY",
+      "FREQ",
+      "CURRENCY",
+      "CURRENCY_DENOM",
+      "EXR_TYPE",
+      "EXR_SUFFIX",
+      "TIME_PERIOD",
+      "OBS_VALUE",
+      "OBS_STATUS",
+      "OBS_CONF",
+      "OBS_PRE_BREAK",
+      "OBS_COM",
+      "TIME_FORMAT",
+      "BREAKS",
+      "COLLECTION",
+      "COMPILING_ORG",
+      "DISS_ORG",
+      "DOM_SER_IDS",
+      "PUBL_ECB",
+      "PUBL_MU",
+      "PUBL_PUBLIC",
+      "UNIT_INDEX_BASE",
+      "COMPILATION",
+      "COVERAGE",
+      "DECIMALS",
+      "NAT_TITLE",
+      "SOURCE_AGENCY",
+      "SOURCE_PUB",
+      "TITLE",
+      "TITLE_COMPL",
+      "UNIT",
+      "UNIT_MULT"
+    ],
+    "observations": 268,
+    "first_observation_date": "2010-12-01",
+    "last_observation_date": "2011-12-09",
+    "invalid_dates": 0,
+    "missing_or_invalid_rates": 2,
+    "zero_or_negative_rates": 0,
+    "unexpected_series_rows": 0,
+    "series_dimensions_checked": true,
+    "duplicate_observation_dates": 0,
+    "weekend_observations": 0,
+    "rate_min": 0.83155,
+    "rate_max": 0.905,
+    "sample_first_3_rows": [
+      {
+        "KEY": "EXR.D.GBP.EUR.SP00.A",
+        "FREQ": "D",
+        "CURRENCY": "GBP",
+        "CURRENCY_DENOM": "EUR",
+        "EXR_TYPE": "SP00",
+        "EXR_SUFFIX": "A",
+        "TIME_PERIOD": "2010-12-01",
+        "OBS_VALUE": "0.8393",
+        "OBS_STATUS": "A",
+        "OBS_CONF": NaN,
+        "OBS_PRE_BREAK": NaN,
+        "OBS_COM": NaN,
+        "TIME_FORMAT": "P1D",
+        "BREAKS": NaN,
+        "COLLECTION": "A",
+        "COMPILING_ORG": NaN,
+        "DISS_ORG": NaN,
+        "DOM_SER_IDS": NaN,
+        "PUBL_ECB": NaN,
+        "PUBL_MU": NaN,
+        "PUBL_PUBLIC": NaN,
+        "UNIT_INDEX_BASE": "99Q1=100",
+        "COMPILATION": NaN,
+        "COVERAGE": NaN,
+        "DECIMALS": "5",
+        "NAT_TITLE": NaN,
+        "SOURCE_AGENCY": "4F0",
+        "SOURCE_PUB": NaN,
+        "TITLE": "Pound sterling/Euro ECB reference exchange rate",
+        "TITLE_COMPL": "ECB reference exchange rate, Pound sterling/Euro, 2.15 pm (C.E.T.)",
+        "UNIT": "GBP",
+        "UNIT_MULT": "0"
+      },
+      {
+        "KEY": "EXR.D.GBP.EUR.SP00.A",
+        "FREQ": "D",
+        "CURRENCY": "GBP",
+        "CURRENCY_DENOM": "EUR",
+        "EXR_TYPE": "SP00",
+        "EXR_SUFFIX": "A",
+        "TIME_PERIOD": "2010-12-02",
+        "OBS_VALUE": "0.8445",
+        "OBS_STATUS": "A",
+        "OBS_CONF": NaN,
+        "OBS_PRE_BREAK": NaN,
+        "OBS_COM": NaN,
+        "TIME_FORMAT": "P1D",
+        "BREAKS": NaN,
+        "COLLECTION": "A",
+        "COMPILING_ORG": NaN,
+        "DISS_ORG": NaN,
+        "DOM_SER_IDS": NaN,
+        "PUBL_ECB": NaN,
+        "PUBL_MU": NaN,
+        "PUBL_PUBLIC": NaN,
+        "UNIT_INDEX_BASE": "99Q1=100",
+        "COMPILATION": NaN,
+        "COVERAGE": NaN,
+        "DECIMALS": "5",
+        "NAT_TITLE": NaN,
+        "SOURCE_AGENCY": "4F0",
+        "SOURCE_PUB": NaN,
+        "TITLE": "Pound sterling/Euro ECB reference exchange rate",
+        "TITLE_COMPL": "ECB reference exchange rate, Pound sterling/Euro, 2.15 pm (C.E.T.)",
+        "UNIT": "GBP",
+        "UNIT_MULT": "0"
+      },
+      {
+        "KEY": "EXR.D.GBP.EUR.SP00.A",
+        "FREQ": "D",
+        "CURRENCY": "GBP",
+        "CURRENCY_DENOM": "EUR",
+        "EXR_TYPE": "SP00",
+        "EXR_SUFFIX": "A",
+        "TIME_PERIOD": "2010-12-03",
+        "OBS_VALUE": "0.848",
+        "OBS_STATUS": "A",
+        "OBS_CONF": NaN,
+        "OBS_PRE_BREAK": NaN,
+        "OBS_COM": NaN,
+        "TIME_FORMAT": "P1D",
+        "BREAKS": NaN,
+        "COLLECTION": "A",
+        "COMPILING_ORG": NaN,
+        "DISS_ORG": NaN,
+        "DOM_SER_IDS": NaN,
+        "PUBL_ECB": NaN,
+        "PUBL_MU": NaN,
+        "PUBL_PUBLIC": NaN,
+        "UNIT_INDEX_BASE": "99Q1=100",
+        "COMPILATION": NaN,
+        "COVERAGE": NaN,
+        "DECIMALS": "5",
+        "NAT_TITLE": NaN,
+        "SOURCE_AGENCY": "4F0",
+        "SOURCE_PUB": NaN,
+        "TITLE": "Pound sterling/Euro ECB reference exchange rate",
+        "TITLE_COMPL": "ECB reference exchange rate, Pound sterling/Euro, 2.15 pm (C.E.T.)",
+        "UNIT": "GBP",
+        "UNIT_MULT": "0"
+      }
+    ]
+  }
+}
